@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinanceApp</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <!-- ══ AUTH ══════════════════════════════════════════ -->
+  <div class="auth-wrap" id="auth-wrap" style="display:none">
+    <div class="auth-box">
+      <div class="auth-logo"><i class="ti ti-coin"></i>FinanceApp</div>
+      <div style="display:flex;border-bottom:0.5px solid rgba(0,0,0,0.1);margin-bottom:1.5rem">
+        <div class="auth-tab active" id="tab-login" onclick="setAuthTab('login',this)" style="flex:1;padding:8px;text-align:center;font-size:14px;cursor:pointer;
+                  border-bottom:2px solid #1D9E75;color:#0F6E56;font-weight:500">
+          Entrar
+        </div>
+        <div class="auth-tab" id="tab-register" onclick="setAuthTab('register',this)" style="flex:1;padding:8px;text-align:center;font-size:14px;cursor:pointer;
+                  border-bottom:2px solid transparent;color:#666">
+          Criar conta
+        </div>
+      </div>
+      <div id="auth-error" style="display:none;background:#FCEBEB;color:#791F1F;padding:8px 12px;
+                border-radius:8px;font-size:13px;margin-bottom:12px"></div>
+
+      <!-- Login -->
+      <div id="form-login" style="display:flex;flex-direction:column;gap:12px">
+        <div>
+          <label style="font-size:13px;color:#666;display:block;margin-bottom:4px">Email</label>
+          <input type="email" id="login-email" placeholder="seu@email.com">
+        </div>
+        <div>
+          <label style="font-size:13px;color:#666;display:block;margin-bottom:4px">Senha</label>
+          <input type="password" id="login-password" placeholder="••••••">
+        </div>
+        <button class="btn btn-primary" onclick="doLogin()">Entrar</button>
+      </div>
+
+      <!-- Registro -->
+      <div id="form-register" style="display:none;flex-direction:column;gap:12px">
+        <div>
+          <label style="font-size:13px;color:#666;display:block;margin-bottom:4px">Nome</label>
+          <input type="text" id="reg-name" placeholder="Seu nome">
+        </div>
+        <div>
+          <label style="font-size:13px;color:#666;display:block;margin-bottom:4px">Email</label>
+          <input type="email" id="reg-email" placeholder="seu@email.com">
+        </div>
+        <div>
+          <label style="font-size:13px;color:#666;display:block;margin-bottom:4px">Senha</label>
+          <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres">
+        </div>
+        <button class="btn btn-primary" onclick="doRegister()">Criar conta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ APP ═══════════════════════════════════════════ -->
+  <div class="app" id="app">
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <div class="sidebar-logo"><i class="ti ti-coin"></i>FinanceApp</div>
+      <div class="sidebar-user">
+        <span id="user-name"></span>
+        <button class="btn btn-sm" onclick="doLogout()">Sair</button>
+      </div>
+      <span class="nav-section">Principal</span>
+      <div class="nav-item active" onclick="showPage('dashboard',this)">
+        <i class="ti ti-layout-dashboard"></i>Dashboard
+      </div>
+      <div class="nav-item" onclick="showPage('transactions',this)">
+        <i class="ti ti-arrows-exchange"></i>Lançamentos
+      </div>
+      <span class="nav-section">Gestão</span>
+      <div class="nav-item" onclick="showPage('accounts',this)">
+        <i class="ti ti-building-bank"></i>Contas
+      </div>
+      <div class="nav-item" onclick="showPage('categories',this)">
+        <i class="ti ti-tag"></i>Categorias
+      </div>
+      <div class="nav-item" onclick="showPage('budget',this)">
+        <i class="ti ti-chart-pie"></i>Orçamento
+      </div>
+      <div class="nav-item" onclick="showPage('reports',this)">
+        <i class="ti ti-chart-bar"></i>Relatórios
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <span class="page-title">Dashboard</span>
+          <button class="btn btn-primary" onclick="openTxModal()">
+            <i class="ti ti-plus"></i>Novo lançamento
+          </button>
+        </div>
+        <div class="metrics" id="metrics-dashboard"></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">
+              Últimos lançamentos
+              <span class="link" onclick="showPage('transactions',document.querySelectorAll('.nav-item')[1])">
+                Ver todos →
+              </span>
+            </div>
+            <div class="tx-list" id="dash-tx-list"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              Gastos por categoria
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                <button class="filter-btn active" id="chart-filter-month" onclick="setChartFilter('month',this)">Este
+                  mês</button>
+                <button class="filter-btn" id="chart-filter-3months" onclick="setChartFilter('3months',this)">3
+                  meses</button>
+                <button class="filter-btn" id="chart-filter-6months" onclick="setChartFilter('6months',this)">6
+                  meses</button>
+                <button class="filter-btn" id="chart-filter-year" onclick="setChartFilter('year',this)">Este
+                  ano</button>
+                <button class="filter-btn" id="chart-filter-all" onclick="setChartFilter('all',this)">Tudo</button>
+                <button class="filter-btn" id="chart-filter-custom" onclick="setChartFilter('custom',this)">📅
+                  Período</button>
+              </div>
+            </div>
+            <div class="date-range" id="chart-date-range">
+              <label>De</label>
+              <input type="date" id="chart-date-start" onchange="applyChartDateFilter()">
+              <label>até</label>
+              <input type="date" id="chart-date-end" onchange="applyChartDateFilter()">
+              <button class="btn btn-primary btn-sm" onclick="applyChartDateFilter()">
+                <i class="ti ti-search"></i>Aplicar
+              </button>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="catChart" role="img" aria-label="Gráfico de gastos por categoria"></canvas>
+            </div>
+            <div class="legend-row" id="cat-legend"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Evolução mensal (últimos 6 meses)</div>
+          <div class="chart-wrap" style="height:200px">
+            <canvas id="monthChart" role="img" aria-label="Evolução mensal"></canvas>
+          </div>
+          <div class="legend-row">
+            <span class="legend-item"><span class="legend-dot" style="background:#1D9E75"></span>Receitas</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#E24B4A"></span>Despesas</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- LANÇAMENTOS -->
+      <div class="page" id="page-transactions">
+        <div class="page-header">
+          <span class="page-title">Lançamentos</span>
+          <button class="btn btn-primary" onclick="openTxModal()">
+            <i class="ti ti-plus"></i>Novo lançamento
+          </button>
+        </div>
+        <div class="filter-bar">
+          <button class="filter-btn active" onclick="setFilter('all',this)">Todos</button>
+          <button class="filter-btn" onclick="setFilter('income',this)">Receitas</button>
+          <button class="filter-btn" onclick="setFilter('expense',this)">Despesas</button>
+          <button class="filter-btn" onclick="setFilter('transfer',this)">Transferências</button>
+          <button class="filter-btn" onclick="setFilter('credit_card',this)">💳 Cartão de crédito</button>
+          <button class="filter-btn" id="tx-filter-custom" onclick="setFilter('custom',this)">📅 Período</button>
+        </div>
+        <div class="date-range" id="tx-date-range">
+          <label>De</label>
+          <input type="date" id="tx-date-start" onchange="renderTransactions()">
+          <label>até</label>
+          <input type="date" id="tx-date-end" onchange="renderTransactions()">
+          <button class="btn btn-primary btn-sm" onclick="renderTransactions()">
+            <i class="ti ti-search"></i>Aplicar
+          </button>
+          <span id="tx-period-count" style="font-size:12px;color:#666;margin-left:4px"></span>
+        </div>
+        <div class="card">
+          <div class="tx-list" id="all-tx-list"></div>
+        </div>
+      </div>
+
+      <!-- CONTAS -->
+      <div class="page" id="page-accounts">
+        <div class="page-header">
+          <span class="page-title">Contas</span>
+        </div>
+        <div class="metrics" id="acc-summary"></div>
+        <div class="grid-3" id="accounts-grid"></div>
+      </div>
+
+      <!-- CATEGORIAS -->
+      <div class="page" id="page-categories">
+        <div class="page-header">
+          <span class="page-title">Categorias</span>
+          <button class="btn btn-primary" onclick="openCatModal()">
+            <i class="ti ti-plus"></i>Nova categoria
+          </button>
+        </div>
+        <div class="tab-bar">
+          <div class="tab active" id="tab-expense" onclick="setCatTab('expense',this)">Despesas</div>
+          <div class="tab" id="tab-income" onclick="setCatTab('income',this)">Receitas</div>
+        </div>
+        <div class="cat-grid" id="cat-grid"></div>
+      </div>
+
+      <!-- ORÇAMENTO -->
+      <div class="page" id="page-budget">
+        <div class="page-header"><span class="page-title">Orçamento mensal</span></div>
+        <div class="card" id="budget-card"></div>
+      </div>
+
+      <!-- RELATÓRIOS -->
+      <div class="page" id="page-reports">
+        <div class="page-header"><span class="page-title">Relatórios</span></div>
+        <div class="metrics" id="report-metrics"></div>
+        <div class="card">
+          <div class="card-title">Receitas vs Despesas por mês</div>
+          <div class="chart-wrap" style="height:260px">
+            <canvas id="reportChart" role="img" aria-label="Relatório mensal"></canvas>
+          </div>
+          <div class="legend-row">
+            <span class="legend-item"><span class="legend-dot" style="background:#1D9E75"></span>Receitas</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#E24B4A"></span>Despesas</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#378ADD"></span>Resultado</span>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ══ MODAL: LANÇAMENTO ══════════════════════════════ -->
+  <div class="modal-bg" id="modal-tx">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Novo lançamento</span>
+        <button class="btn" onclick="closeTxModal()" style="padding:4px 8px;border:none">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo</label>
+        <div class="radio-group">
+          <button class="radio-btn sel-expense" id="rb-expense" onclick="selectTxType('expense')">Despesa</button>
+          <button class="radio-btn" id="rb-income" onclick="selectTxType('income')">Receita</button>
+          <button class="radio-btn" id="rb-transfer" onclick="selectTxType('transfer')">Transferência</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Descrição</label>
+          <input type="text" id="f-desc" placeholder="Ex: Supermercado">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Valor (R$)</label>
+          <input type="number" id="f-amount" placeholder="0,00" step="0.01" min="0">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Data</label>
+          <input type="date" id="f-date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Conta</label>
+          <select id="f-account"></select>
+        </div>
+      </div>
+      <div class="form-group" id="cat-group">
+        <label class="form-label">Categoria</label>
+        <select id="f-cat"></select>
+      </div>
+      <div class="form-group" id="transfer-type-group" style="display:none">
+        <label class="form-label">Tipo de transferência</label>
+        <div class="radio-group">
+          <button class="radio-btn sel-transfer" id="rtb-own" onclick="setTransferType('own')">Entre minhas
+            contas</button>
+          <button class="radio-btn" id="rtb-third" onclick="setTransferType('third')">Para terceiros</button>
+        </div>
+      </div>
+      <div class="form-group" id="dest-account-group" style="display:none">
+        <label class="form-label">Conta destino</label>
+        <select id="f-dest-account"></select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeTxModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="addTransaction()">
+          <i class="ti ti-check"></i>Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL: CONTA ═══════════════════════════════════ -->
+  <div class="modal-bg" id="modal-acc">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Nova conta</span>
+        <button class="btn" onclick="closeAccountModal()" style="padding:4px 8px;border:none">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nome da conta</label>
+        <input type="text" id="acc-name" placeholder="Ex: Nubank">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tipo</label>
+          <select id="acc-type">
+            <option>Conta corrente</option>
+            <option>Poupança</option>
+            <option>Carteira</option>
+            <option>Investimento</option>
+            <option>Cartão de crédito</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Saldo inicial (R$)</label>
+          <input type="number" id="acc-balance" placeholder="0,00" step="0.01">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeAccountModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="addAccount()">
+          <i class="ti ti-check"></i>Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL: CATEGORIA ═══════════════════════════════ -->
+  <div class="modal-bg" id="modal-cat">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="cat-modal-title">Nova categoria</span>
+        <button class="btn" onclick="closeCatModal()" style="padding:4px 8px;border:none">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo</label>
+        <div class="radio-group">
+          <button class="radio-btn sel-expense" id="crb-expense" onclick="selectCatType('expense')">Despesa</button>
+          <button class="radio-btn" id="crb-income" onclick="selectCatType('income')">Receita</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nome</label>
+        <input type="text" id="c-name" placeholder="Ex: Academia, Streaming...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ícone</label>
+        <div class="icon-picker" id="icon-picker"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cor</label>
+        <div class="color-picker" id="color-picker"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">
+          Orçamento mensal (R$)
+          <span style="color:#aaa;font-size:11px;margin-left:4px">opcional</span>
+        </label>
+        <input type="number" id="c-budget" placeholder="0,00" step="0.01" min="0">
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeCatModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveCategory()">
+          <i class="ti ti-check"></i>Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL: PAGAR FATURA ════════════════════════════ -->
+  <div class="modal-bg" id="modal-invoice">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="invoice-modal-title">Pagar fatura</span>
+        <button class="btn" onclick="closePayInvoiceModal()" style="padding:4px 8px;border:none">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+      <div class="info-box">
+        <strong>Fatura atual:</strong> <span id="invoice-amount"></span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Débitar de qual conta?</label>
+        <select id="invoice-debit-account"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">
+          Valor a pagar (R$)
+          <span style="color:#aaa;font-size:11px;margin-left:4px">deixe em branco para pagar total</span>
+        </label>
+        <input type="number" id="invoice-amount-input" step="0.01" min="0" placeholder="Pagar valor total">
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closePayInvoiceModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="confirmPayInvoice()">
+          <i class="ti ti-check"></i>Confirmar pagamento
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCRIPTS ════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/transactions.js"></script>
+  <script src="js/accounts.js"></script>
+  <script src="js/categories.js"></script>
+  <script src="js/budget.js"></script>
+  <script src="js/reports.js"></script>
+  <script>
+    // Inicialização
+    if (token) {
+      initApp();
+    } else {
+      document.getElementById('auth-wrap').style.display = 'flex';
+    }
+  </script>
+
+</body>
+
+</html>
